@@ -81,17 +81,15 @@ def compute_total(
             errors.append(f"[ERROR] Invalid quantity for '{product}'. Skipping.")
             continue
 
-        if qty < 0:
-            errors.append(f"[ERROR] Negative quantity for '{product}' ({qty}). Skipping.")
-            continue
-
         if product not in prices:
             warnings.append(f"[WARN] Product not found: '{product}'. Skipping.")
             continue
 
+        # Ahora SÍ se consideran cantidades negativas:
         total += prices[product] * qty
 
     return total, warnings, errors
+    
 
 
 def build_report(

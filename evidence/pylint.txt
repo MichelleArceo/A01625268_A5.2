@@ -1,6 +1,4 @@
-************* Module computeSales
-computeSales.py:174:8: W0105: String statement has no effect (pointless-string-statement)
 
--------------------------------------------------------------------
-Your code has been rated at 9.91/10 (previous run: 10.00/10, -0.09)
+--------------------------------------------------------------------
+Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
 

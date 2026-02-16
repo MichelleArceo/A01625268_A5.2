@@ -1,0 +1,2 @@
+computeSales.py:174:9: E128 continuation line under-indented for visual indent
+computeSales.py:175:9: E124 closing bracket does not match visual indentation

@@ -170,8 +170,9 @@ def build_report(
 def main(argv: List[str]) -> int:
     """Run the program."""
     if len(argv) != 3:
-        usage = ("Usage: python computeSales.py priceCatalogue.json "
-        "salesRecord.json"
+        usage = (
+            "Usage: python computeSales.py priceCatalogue.json "
+            "salesRecord.json"
         )
         eprint(usage)
         return 2

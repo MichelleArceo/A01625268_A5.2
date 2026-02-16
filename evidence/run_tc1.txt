@@ -1,0 +1,15 @@
+=== Sales Computation Results ===
+Catalogue: data/TC1.ProductList.json
+Sales:     data/TC1.Sales.json
+
+TOTAL COST: 2,481.86
+
+Errors (skipped):
+- None
+
+Warnings (skipped):
+- None
+
+Elapsed time (s): 0.000651
+===============================
+

@@ -39,30 +39,34 @@ def build_price_map(catalogue: Any) -> Dict[str, float]:
 
     for idx, item in enumerate(catalogue):
         if not isinstance(item, dict):
-            eprint(f"[ERROR] Catalogue item #{idx} is not an object. Skipping.")
+            msg = f"[ERROR] Catalogue item #{idx} is not an object. Skipping."
+            eprint(msg)
             continue
 
         title = item.get("title")
         price = item.get("price")
 
         if not isinstance(title, str) or not title.strip():
-            eprint(f"[ERROR] Catalogue item #{idx} has invalid title. Skipping.")
+            msg = f"[ERROR] Catalogue item #{idx} has invalid title. Skipping."
+            eprint(msg)
             continue
 
         try:
             price_value = float(price)
         except (TypeError, ValueError):
-            eprint(
+            msg = (
                 f"[ERROR] Catalogue item #{idx} has invalid price for '{title}'. "
                 "Skipping."
             )
+            eprint(msg)
             continue
 
         if price_value < 0:
-            eprint(
+            msg = (
                 f"[ERROR] Catalogue item #{idx} has negative price for '{title}'. "
                 "Skipping."
             )
+            eprint(msg)
             continue
 
         prices[title] = price_value
@@ -85,7 +89,9 @@ def compute_total(
 
     for idx, row in enumerate(sales):
         if not isinstance(row, dict):
-            errors.append(f"[ERROR] Sales row #{idx} is not an object. Skipping.")
+            errors.append(
+                f"[ERROR] Sales row #{idx} is not an object. Skipping."
+            )
             continue
 
         product = row.get("Product")
@@ -100,7 +106,9 @@ def compute_total(
         try:
             qty = float(quantity)
         except (TypeError, ValueError):
-            errors.append(f"[ERROR] Invalid Quantity for '{product}'. Skipping.")
+            errors.append(
+                f"[ERROR] Invalid Quantity for '{product}'. Skipping."
+            )
             continue
 
         if product not in prices:
@@ -117,13 +125,13 @@ def compute_total(
 def build_report(
     catalogue_path: Path,
     sales_path: Path,
-    total: float,
-    warnings: List[str],
-    errors: List[str],
-    stats: Dict[str, float],
+    report_data: Dict[str, Any],
 ) -> str:
     """Build a human-readable report for console and output file."""
-    elapsed = stats.get("elapsed_seconds", 0.0)
+    total = float(report_data.get("total", 0.0))
+    warnings = report_data.get("warnings", [])
+    errors = report_data.get("errors", [])
+    elapsed = float(report_data.get("elapsed_seconds", 0.0))
 
     lines: List[str] = [
         "=== Sales Computation Results ===",
@@ -161,7 +169,8 @@ def build_report(
 def main(argv: List[str]) -> int:
     """Run the program."""
     if len(argv) != 3:
-        eprint("Usage: python computeSales.py priceCatalogue.json salesRecord.json")
+        usage = "Usage: python computeSales.py priceCatalogue.json salesRecord.json"
+        eprint(usage)
         return 2
 
     catalogue_path = Path(argv[1])
@@ -178,15 +187,18 @@ def main(argv: List[str]) -> int:
     total, warnings, errors = compute_total(prices, sales)
 
     elapsed_seconds = time.perf_counter() - start
-    stats = {"elapsed_seconds": elapsed_seconds}
+
+    report_data = {
+        "total": total,
+        "warnings": warnings,
+        "errors": errors,
+        "elapsed_seconds": elapsed_seconds,
+    }
 
     report = build_report(
         catalogue_path=catalogue_path,
         sales_path=sales_path,
-        total=total,
-        warnings=warnings,
-        errors=errors,
-        stats=stats,
+        report_data=report_data,
     )
 
     print(report)

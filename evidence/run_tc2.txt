@@ -2,15 +2,14 @@
 Catalogue: data/TC1.ProductList.json
 Sales:     data/TC2.Sales.json
 
-TOTAL COST: 169,478.22
+TOTAL COST: 166,568.23
 
 Errors (skipped):
-- [ERROR] Negative quantity for 'Fresh blueberries' (-35.0). Skipping.
-- [ERROR] Negative quantity for 'Green smoothie' (-123.0). Skipping.
+- None
 
 Warnings (skipped):
 - None
 
-Elapsed time (s): 0.000661
+Elapsed time (s): 0.000408
 ===============================
 

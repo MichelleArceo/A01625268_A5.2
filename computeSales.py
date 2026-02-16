@@ -1,5 +1,9 @@
 import json
 import sys
+from pathlib import Path
+
+
+RESULTS_FILE = Path("SalesResults.txt")
 
 
 def main() -> int:
@@ -19,6 +23,9 @@ def main() -> int:
     prices = {item["title"]: float(item["price"]) for item in catalogue}
 
     total = 0.0
+    warnings = []
+    errors = []
+
     for row in sales:
         product = row.get("Product")
         quantity = row.get("Quantity")
@@ -26,20 +33,37 @@ def main() -> int:
         try:
             qty = float(quantity)
         except (TypeError, ValueError):
-            print(f"[ERROR] Invalid quantity for '{product}'. Skipping.")
+            errors.append(f"[ERROR] Invalid quantity for '{product}'. Skipping.")
             continue
 
         if qty < 0:
-            print(f"[ERROR] Negative quantity for '{product}' ({qty}). Skipping.")
+            errors.append(f"[ERROR] Negative quantity for '{product}' ({qty}). Skipping.")
             continue
 
         if product not in prices:
-            print(f"[WARN] Product not found: '{product}'. Skipping.")
+            warnings.append(f"[WARN] Product not found: '{product}'. Skipping.")
             continue
 
         total += prices[product] * qty
 
-    print(f"TOTAL COST: {total:.2f}")
+    report_lines = [
+        "=== Sales Computation Results ===",
+        f"Catalogue: {catalogue_path}",
+        f"Sales:     {sales_path}",
+        "",
+        f"TOTAL COST: {total:,.2f}",
+        "",
+        "Errors (skipped):",
+        *([f"- {e}" for e in errors] or ["- None"]),
+        "",
+        "Warnings (skipped):",
+        *([f"- {w}" for w in warnings] or ["- None"]),
+        "",
+    ]
+    report = "\n".join(report_lines)
+
+    print(report)
+    RESULTS_FILE.write_text(report, encoding="utf-8")
     return 0
 
 

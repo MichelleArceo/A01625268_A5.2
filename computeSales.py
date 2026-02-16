@@ -1,37 +1,79 @@
+#!/usr/bin/env python3
+"""
+Compute total sales cost from a product catalogue and a sales record.
+Writes a human-readable report to SalesResults.txt.
+"""
+
+from __future__ import annotations
+
 import json
 import sys
 import time
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 
 RESULTS_FILE = Path("SalesResults.txt")
 
 
-def main() -> int:
-    if len(sys.argv) != 3:
-        print("Usage: python computeSales.py priceCatalogue.json salesRecord.json")
-        return 2
+def eprint(msg: str) -> None:
+    print(msg, file=sys.stderr)
 
-    start = time.perf_counter()
 
-    catalogue_path = sys.argv[1]
-    sales_path = sys.argv[2]
+def load_json(path: Path) -> Optional[Any]:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        eprint(f"[ERROR] Cannot load JSON from {path}: {exc}")
+        return None
 
-    with open(catalogue_path, "r", encoding="utf-8") as f:
-        catalogue = json.load(f)
 
-    with open(sales_path, "r", encoding="utf-8") as f:
-        sales = json.load(f)
+def build_price_map(catalogue: Any) -> Dict[str, float]:
+    prices: Dict[str, float] = {}
+    if not isinstance(catalogue, list):
+        eprint("[ERROR] Catalogue JSON must be a list.")
+        return prices
 
-    prices = {item["title"]: float(item["price"]) for item in catalogue}
+    for item in catalogue:
+        if not isinstance(item, dict):
+            continue
+        title = item.get("title")
+        price = item.get("price")
+        if not isinstance(title, str) or not title.strip():
+            continue
+        try:
+            price_value = float(price)
+        except (TypeError, ValueError):
+            continue
+        if price_value >= 0:
+            prices[title] = price_value
 
+    return prices
+
+
+def compute_total(
+    prices: Dict[str, float],
+    sales: Any,
+) -> Tuple[float, List[str], List[str]]:
     total = 0.0
-    warnings = []
-    errors = []
+    warnings: List[str] = []
+    errors: List[str] = []
+
+    if not isinstance(sales, list):
+        errors.append("[ERROR] Sales JSON must be a list.")
+        return total, warnings, errors
 
     for row in sales:
+        if not isinstance(row, dict):
+            errors.append("[ERROR] Invalid sales row format. Skipping.")
+            continue
+
         product = row.get("Product")
         quantity = row.get("Quantity")
+
+        if not isinstance(product, str) or not product.strip():
+            errors.append("[ERROR] Missing or invalid Product. Skipping.")
+            continue
 
         try:
             qty = float(quantity)
@@ -49,9 +91,18 @@ def main() -> int:
 
         total += prices[product] * qty
 
-    elapsed = time.perf_counter() - start
+    return total, warnings, errors
 
-    report_lines = [
+
+def build_report(
+    catalogue_path: Path,
+    sales_path: Path,
+    total: float,
+    warnings: List[str],
+    errors: List[str],
+    elapsed: float,
+) -> str:
+    lines = [
         "=== Sales Computation Results ===",
         f"Catalogue: {catalogue_path}",
         f"Sales:     {sales_path}",
@@ -68,7 +119,29 @@ def main() -> int:
         "===============================",
         "",
     ]
-    report = "\n".join(report_lines)
+    return "\n".join(lines)
+
+
+def main(argv: List[str]) -> int:
+    if len(argv) != 3:
+        eprint("Usage: python computeSales.py priceCatalogue.json salesRecord.json")
+        return 2
+
+    catalogue_path = Path(argv[1])
+    sales_path = Path(argv[2])
+
+    start = time.perf_counter()
+
+    catalogue = load_json(catalogue_path)
+    sales = load_json(sales_path)
+    if catalogue is None or sales is None:
+        return 1
+
+    prices = build_price_map(catalogue)
+    total, warnings, errors = compute_total(prices, sales)
+
+    elapsed = time.perf_counter() - start
+    report = build_report(catalogue_path, sales_path, total, warnings, errors, elapsed)
 
     print(report)
     RESULTS_FILE.write_text(report, encoding="utf-8")
@@ -76,4 +149,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv))

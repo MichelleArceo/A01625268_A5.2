@@ -55,7 +55,7 @@ def build_price_map(catalogue: Any) -> Dict[str, float]:
             price_value = float(price)
         except (TypeError, ValueError):
             msg = (
-                f"[ERROR] Catalogue item #{idx} has invalid price for '{title}'. "
+                f"[ERROR] Catalogue item #{idx} has invalid price. "
                 "Skipping."
             )
             eprint(msg)
@@ -63,7 +63,7 @@ def build_price_map(catalogue: Any) -> Dict[str, float]:
 
         if price_value < 0:
             msg = (
-                f"[ERROR] Catalogue item #{idx} has negative price for '{title}'. "
+                f"[ERROR] Catalogue item #{idx} has negative price. "
                 "Skipping."
             )
             eprint(msg)
@@ -113,7 +113,8 @@ def compute_total(
 
         if product not in prices:
             warnings.append(
-                f"[WARN] Product not found in catalogue: '{product}'. Skipping."
+                f"[WARN] Product not found in catalogue: '{product}'. "
+                "Skipping."
             )
             continue
 
@@ -169,7 +170,8 @@ def build_report(
 def main(argv: List[str]) -> int:
     """Run the program."""
     if len(argv) != 3:
-        usage = "Usage: python computeSales.py priceCatalogue.json salesRecord.json"
+        usage = "Usage: python computeSales.py priceCatalogue.json "
+        "salesRecord.json"
         eprint(usage)
         return 2
 

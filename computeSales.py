@@ -16,11 +16,13 @@ def main() -> None:
     with open(sales_path, "r", encoding="utf-8") as f:
         sales = json.load(f)
 
-    prices = {item["product"]: float(item["price"]) for item in catalogue}
+    prices = {item["title"]: float(item["price"]) for item in catalogue}
 
     total = 0.0
     for row in sales:
-        total += prices[row["product"]] * float(row["quantity"])
+        product = row["Product"]
+        qty = float(row["Quantity"])
+        total += prices[product] * qty
 
     print(f"TOTAL COST: {total:.2f}")
 

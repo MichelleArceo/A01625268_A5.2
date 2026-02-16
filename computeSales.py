@@ -1,5 +1,6 @@
 import json
 import sys
+import time
 from pathlib import Path
 
 
@@ -10,6 +11,8 @@ def main() -> int:
     if len(sys.argv) != 3:
         print("Usage: python computeSales.py priceCatalogue.json salesRecord.json")
         return 2
+
+    start = time.perf_counter()
 
     catalogue_path = sys.argv[1]
     sales_path = sys.argv[2]
@@ -46,6 +49,8 @@ def main() -> int:
 
         total += prices[product] * qty
 
+    elapsed = time.perf_counter() - start
+
     report_lines = [
         "=== Sales Computation Results ===",
         f"Catalogue: {catalogue_path}",
@@ -58,6 +63,9 @@ def main() -> int:
         "",
         "Warnings (skipped):",
         *([f"- {w}" for w in warnings] or ["- None"]),
+        "",
+        f"Elapsed time (s): {elapsed:.6f}",
+        "===============================",
         "",
     ]
     report = "\n".join(report_lines)

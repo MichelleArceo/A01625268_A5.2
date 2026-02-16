@@ -1,0 +1,14 @@
+************* Module computeSales
+computeSales.py:1:0: C0103: Module name "computeSales" doesn't conform to snake_case naming style (invalid-name)
+computeSales.py:19:0: C0116: Missing function or method docstring (missing-function-docstring)
+computeSales.py:23:0: C0116: Missing function or method docstring (missing-function-docstring)
+computeSales.py:31:0: C0116: Missing function or method docstring (missing-function-docstring)
+computeSales.py:54:0: C0116: Missing function or method docstring (missing-function-docstring)
+computeSales.py:97:0: C0116: Missing function or method docstring (missing-function-docstring)
+computeSales.py:97:0: R0913: Too many arguments (6/5) (too-many-arguments)
+computeSales.py:97:0: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+computeSales.py:125:0: C0116: Missing function or method docstring (missing-function-docstring)
+
+-----------------------------------
+Your code has been rated at 8.95/10
+

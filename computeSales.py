@@ -2,10 +2,10 @@ import json
 import sys
 
 
-def main() -> None:
+def main() -> int:
     if len(sys.argv) != 3:
         print("Usage: python computeSales.py priceCatalogue.json salesRecord.json")
-        return
+        return 2
 
     catalogue_path = sys.argv[1]
     sales_path = sys.argv[2]
@@ -20,12 +20,28 @@ def main() -> None:
 
     total = 0.0
     for row in sales:
-        product = row["Product"]
-        qty = float(row["Quantity"])
+        product = row.get("Product")
+        quantity = row.get("Quantity")
+
+        try:
+            qty = float(quantity)
+        except (TypeError, ValueError):
+            print(f"[ERROR] Invalid quantity for '{product}'. Skipping.")
+            continue
+
+        if qty < 0:
+            print(f"[ERROR] Negative quantity for '{product}' ({qty}). Skipping.")
+            continue
+
+        if product not in prices:
+            print(f"[WARN] Product not found: '{product}'. Skipping.")
+            continue
+
         total += prices[product] * qty
 
     print(f"TOTAL COST: {total:.2f}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
